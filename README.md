@@ -1,17 +1,26 @@
-# To Do Rest API
+<p align="center">
+  <a href="https://oficialexdev.github.io/portifolio/#/" target="_blank"><img src="./a.svg" width="200" alt="Alex Logo" /></a>
+</p>
 
+# To Do 
 ## Stack
-
+### Back-End Rest API
 - [X]   Docker
 - [X]   .NET 8 
 - [X]   Entity Framework Core
 - [X]   PostgreSQL
+- [X]   JWT
 #### To implement
-- [ ]   JWT
+- [ ]   JWT Refresh Token
+- [ ]   Email confirm create user
 - [ ]   Redis
-- [ ]   RabbitMQ
+### Front-End
+#### To implement
+- [ ]   Angular
+- [ ]   Tailwind
 
-#### Command to run
+## API
+#### Command to run backend
 ```
 docker-compose up --build
 ``` 
@@ -34,12 +43,13 @@ Have sure you have .NET SDK and Postgres installed to run this commands
  dotnet-ef
 ```
 ### Install EF tool 
+#### Be sure you are inside project folder, not only in solution folder!
 ```
  dotnet tool install --global dotnet-ef
 ```
 ### Add migrations
 ```
- dotnet ef migrations add "migration-name"
+ dotnet ef migrations add "ToDoMigration"
 ```
 ### Create database
 ```
