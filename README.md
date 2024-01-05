@@ -24,7 +24,7 @@
 ```
 docker-compose up --build
 ``` 
-#### Host to acess API
+#### Host to access API
 ``` 
 https://localhost:8081/
 ``` 
