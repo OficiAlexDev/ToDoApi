@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Add autorization services
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -31,6 +32,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+//Define Swagger authentication options
 builder.Services.AddSwaggerGen(setup =>
 {
     OpenApiSecurityScheme jwtBearer = new()
@@ -61,10 +63,14 @@ builder.Services.AddSwaggerGen(setup =>
     });
 });
 
+//Setting Db Context to use Postgress by Npgsql
 builder.Services.AddDbContext<TodoDbContext>(
     opts =>
         opts.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
     );
+
+// Add dependency injept for JWT Service class
+builder.Services.AddScoped<JWTServices>();
 
 builder.WebHost.UseUrls("https://*:8081");
 
@@ -85,6 +91,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//Define app to use authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -2,8 +2,17 @@
 
 namespace ToDo.Services
 {
+    /// <summary>
+    /// Jason Web Tokens secret services
+    /// </summary>
     public static class JWTSecret
     {
+        /// <summary>
+        /// Return JWT Secret
+        /// </summary>
+        /// <param name="configuration">IConfiguration used to get JWT Secret</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">Maybe exception if is missing JWT Secret in appSettings</exception>
         public static byte[] Key(IConfiguration configuration)
         {
             try

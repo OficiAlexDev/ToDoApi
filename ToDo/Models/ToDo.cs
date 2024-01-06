@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace ToDo.Models
 {
+    /// <summary>
+    /// To Do Model
+    /// </summary>
     public class ToDo
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

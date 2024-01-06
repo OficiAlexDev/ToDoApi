@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using ToDo.Context;
 using ToDo.Models;
@@ -11,16 +12,19 @@ namespace ToDo.Controllers
 {
     [Route("")]
     [ApiController]
-    public class AuthController(TodoDbContext db, IConfiguration configuration) : ControllerBase
+    public class AuthController(TodoDbContext db, JWTServices jwt) : ControllerBase
     {
-        private readonly JWTServices jwt = new(configuration);
         //Regex to valid data
         readonly string passwordPattern = @"^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$";
         readonly string excludeUsernamePattern = @"[\W]";
         readonly string emailPattern = @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$";
-
+        /// <summary>
+        /// Register new user
+        /// </summary>
+        /// <param name="newUser">User credentials</param>
+        /// <returns></returns>
         [HttpPost("signup")]
-        public async Task<IActionResult> SetupADM([FromBody] User newUser)
+        public async Task<IActionResult> Register([FromBody] User newUser)
         {
 
             User? user = db.User.Where(user => Equals(user.Username, newUser.Username)).FirstOrDefault();
@@ -50,22 +54,25 @@ namespace ToDo.Controllers
             await db.SaveChangesAsync();
             return Ok("User creted");
         }
-
+        /// <summary>
+        /// Login existent user
+        /// </summary>
+        /// <param name="userAuth">User credentials</param>
+        /// <returns></returns>
         [HttpPost]
-        public ActionResult AuthenticationAsync([FromBody] UserLogin userAuth)
+        public async Task<ActionResult> Authentication([FromBody] UserLogin userAuth)
         {
             userAuth.Identifier = userAuth.Identifier.ToLower();
             User? user;
-            user = db.User.Where(user =>
+            user = await db.User.Where(user =>
             Regex.IsMatch(userAuth.Identifier, emailPattern) ?
             Equals(user.Email, userAuth.Identifier.ToLower()) :
             Equals(user.Username, userAuth.Identifier.ToLower())
-            ).FirstOrDefault();
+            ).FirstOrDefaultAsync();
             if (user == null || user.Password != Password.Hash(userAuth.Password))
             {
-                return NotFound($"Username or password invalid!");
+                return BadRequest($"Username or password invalid!");
             }
-            user.Password = "";
             return Ok(
                 new
                 {

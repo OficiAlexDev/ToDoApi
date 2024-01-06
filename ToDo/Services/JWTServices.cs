@@ -5,8 +5,17 @@ using ToDo.Models;
 
 namespace ToDo.Services
 {
+    /// <summary>
+    /// General Json Web Tokens services
+    /// </summary>
+    /// <param name="configuration">IConfiguration used to get JWT Secret</param>
     public class JWTServices(IConfiguration configuration)
-    {    
+    {
+        /// <summary>
+        /// Generating JWT based in user credentials
+        /// </summary>
+        /// <param name="user">User Model</param>
+        /// <returns>JWT Token</returns>
         public string GenerateToken(User user)
         {
             JwtSecurityTokenHandler tokenHandler = new();           

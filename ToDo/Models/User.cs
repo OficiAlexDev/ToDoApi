@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ToDo.Models
 {
+    /// <summary>
+    /// User model
+    /// </summary>
     [Index(nameof(Username), IsUnique = true)]
     [Index(nameof(Email), IsUnique = true)]
     public class User
