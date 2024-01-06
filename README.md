@@ -10,6 +10,7 @@
 - [X]   Entity Framework Core
 - [X]   PostgreSQL
 - [X]   JWT
+- [X]   MS Test
 #### To implement
 - [ ]   JWT Refresh Token
 - [ ]   Email confirm create user
