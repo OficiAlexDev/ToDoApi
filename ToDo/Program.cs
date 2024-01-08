@@ -66,11 +66,20 @@ builder.Services.AddSwaggerGen(setup =>
 //Setting Db Context to use Postgress by Npgsql
 builder.Services.AddDbContext<TodoDbContext>(
     opts =>
-        opts.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
-    );
+        opts.UseNpgsql(builder.Configuration.GetConnectionString("DbHost"))
+);
+
+//Setting Redis
+builder.Services.AddStackExchangeRedisCache(opts =>
+    {
+        opts.InstanceName = "cacheToDo";
+        opts.Configuration = builder.Configuration.GetConnectionString("CacheHost");
+    });
 
 // Add dependency injept for JWT Service class
 builder.Services.AddScoped<JWTServices>();
+// Add dependency injept for Redis class
+builder.Services.AddScoped<Redis>();
 
 builder.WebHost.UseUrls("https://*:8081");
 

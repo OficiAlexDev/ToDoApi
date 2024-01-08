@@ -16,7 +16,7 @@ namespace ToDoTest
     {
         static TodoDbContext? dbContext;
         static AuthController? authController;
-        static User testUser = new() { Username = "test1", Email = "test1@test.com", Password = "1234@#Aa" };
+        static readonly User testUser = new() { Username = "test1", Email = "test1@test.com", Password = "1234@#Aa" };
 
         /// <summary>
         /// Test auth controller register user (User must be created)
@@ -25,7 +25,7 @@ namespace ToDoTest
         public async Task SuccessfulRegister()
         {
             IActionResult result = await authController!.Register(new() { Username = "test2register", Email = "test2register@test.com", Password = "1234@#Aa" });
-            Assert.AreEqual<int?>(200, ((OkObjectResult)result).StatusCode);
+            Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
             WriteLine(((OkObjectResult)result).Value);
         }
         /// <summary>
@@ -36,7 +36,7 @@ namespace ToDoTest
         {
             IActionResult result = await authController!.Register(new() { Username = "test2", Email = "test1@test.com", Password = "1234@#Aa" });
             WriteLine(JObject.Parse(result.ToJson())["Value"]);
-            Assert.AreEqual<int?>(400, ((BadRequestObjectResult)result).StatusCode);
+            Assert.AreEqual(400, ((BadRequestObjectResult)result).StatusCode);
         }
         /// <summary>
         /// Test fail register (User must be not created by same name)
@@ -46,7 +46,7 @@ namespace ToDoTest
         {
             IActionResult result = await authController!.Register(new() { Username = "test1", Email = "test2@test.com", Password = "1234@#Aa" });
             WriteLine(JObject.Parse(result.ToJson())["Value"]);
-            Assert.AreEqual<int?>(400, ((BadRequestObjectResult)result).StatusCode);
+            Assert.AreEqual(400, ((BadRequestObjectResult)result).StatusCode);
         }
         /// <summary>
         /// Test fail register (User must be not created by weakness password)
@@ -55,15 +55,15 @@ namespace ToDoTest
         public async Task FailRegisterByPass()
         {
             IActionResult result = await authController!.Register(new() { Username = "test2", Email = "test2@test.com", Password = "12345678" });
-            Assert.AreEqual<int?>(400, ((BadRequestObjectResult)result).StatusCode);
+            Assert.AreEqual(400, ((BadRequestObjectResult)result).StatusCode);
             result = await authController.Register(new() { Username = "test2", Email = "test2@test.com", Password = "Ab3DEFGH" });
-            Assert.AreEqual<int?>(400, ((BadRequestObjectResult)result).StatusCode);
+            Assert.AreEqual(400, ((BadRequestObjectResult)result).StatusCode);
             result = await authController.Register(new() { Username = "test2", Email = "test2@test.com", Password = "Aa1#$" });
-            Assert.AreEqual<int?>(400, ((BadRequestObjectResult)result).StatusCode);
+            Assert.AreEqual(400, ((BadRequestObjectResult)result).StatusCode);
             result = await authController.Register(new() { Username = "test2", Email = "test2@test.com", Password = "Aa123456" });
-            Assert.AreEqual<int?>(400, ((BadRequestObjectResult)result).StatusCode);
+            Assert.AreEqual(400, ((BadRequestObjectResult)result).StatusCode);
             result = await authController.Register(new() { Username = "test2", Email = "test2@test.com", Password = "!@#$%*&#" });
-            Assert.AreEqual<int?>(400, ((BadRequestObjectResult)result).StatusCode);
+            Assert.AreEqual(400, ((BadRequestObjectResult)result).StatusCode);
             WriteLine(JObject.Parse(result.ToJson())["Value"]);
         }
 
@@ -77,7 +77,7 @@ namespace ToDoTest
             WriteLine(JObject.Parse(result.ToJson())["Value"]?["signedWith"]);
             Assert.AreEqual<string?>("Username", JObject.Parse(result.ToJson())["Value"]?["signedWith"]?.ToString());
             Assert.AreEqual<string?>(testUser.Username, JObject.Parse(result.ToJson())["Value"]?["user"]?["username"]?.ToString());
-            Assert.AreEqual<int?>(200, ((OkObjectResult)result).StatusCode);
+            Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace ToDoTest
             WriteLine(JObject.Parse(result.ToJson())["Value"]?["signedWith"]);
             Assert.AreEqual<string?>("Email", JObject.Parse(result.ToJson())["Value"]?["signedWith"]?.ToString());
             Assert.AreEqual<string?>(testUser.Username, JObject.Parse(result.ToJson())["Value"]?["user"]?["username"]?.ToString());
-            Assert.AreEqual<int?>(200, ((OkObjectResult)result).StatusCode);
+            Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
         }
         /// <summary>
         /// Init DB Context and controllers

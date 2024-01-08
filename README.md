@@ -11,10 +11,10 @@
 - [X]   PostgreSQL
 - [X]   JWT
 - [X]   MS Test
+- [X]   Redis
 #### To implement
 - [ ]   JWT Refresh Token
 - [ ]   Email confirm create user
-- [ ]   Redis
 ### Front-End
 #### To implement
 - [ ]   Angular

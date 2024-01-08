@@ -11,6 +11,9 @@ using static System.Console;
 using static System.Convert;
 using System.Text.Json.Nodes;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace ToDoTest
 {
@@ -19,7 +22,7 @@ namespace ToDoTest
     {
         static TodoDbContext? dbContext;
         static ToDoController? toDoController;
-        static string autorizationToken = String.Empty;
+        static string autorizationToken = string.Empty;
         /// <summary>
         ///   Test create To Do
         /// </summary>
@@ -27,18 +30,18 @@ namespace ToDoTest
         public async Task CreateToDo()
         {
             IActionResult result = await toDoController!.CreateTodo("Do Test", autorizationToken);
-            Assert.AreEqual<int?>(200, ((OkObjectResult)result).StatusCode);
-            WriteLine(JsonObject.Parse(((OkObjectResult)result).ToJson())?["Value"]?["message"]);
+            Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
+            WriteLine(JsonNode.Parse(((OkObjectResult)result).ToJson())?["Value"]?["message"]);
         }
         /// <summary>
         ///   Test find all to dos from a user
         /// </summary>
         [TestMethod]
-        public void Find()
+        public async Task Find()
         {
-            IActionResult result = toDoController!.Find(autorizationToken);
-            Assert.AreEqual<int?>(200, ((OkObjectResult)result).StatusCode);
-            WriteLine($"Success find: {JsonObject.Parse(((OkObjectResult)result).ToJson())?["Value"]?["Count"]}");
+            IActionResult result = await toDoController!.Find(autorizationToken);
+            Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
+            WriteLine($"Success find: {JsonNode.Parse(((OkObjectResult)result).ToJson())?["Value"]?["Count"]}");
         }
         /// <summary>
         ///   Test create and find a to do from a user
@@ -47,10 +50,10 @@ namespace ToDoTest
         public async Task CreateAndFindOne()
         {
             string toDoDesc = "Create and find one task id Test";
-            IActionResult result = toDoController!.Find((await CreateToDoInMemory(toDoDesc))!.Id, autorizationToken);
-            Assert.AreEqual<int?>(200, ((OkObjectResult)result).StatusCode);
-            Assert.AreEqual<string>(toDoDesc, JsonObject.Parse(result.ToJson())?["Value"]?["Desc"]?.ToString());
-            WriteLine($"To do created: {JsonObject.Parse(result.ToJson())?["Value"]?["Desc"]}");
+            IActionResult result = await toDoController!.Find((await CreateToDoInMemory(toDoDesc))!.Id, autorizationToken);
+            Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
+            Assert.AreEqual(toDoDesc, JsonNode.Parse(result.ToJson())?["Value"]?["Desc"]?.ToString());
+            WriteLine($"To do created: {JsonNode.Parse(result.ToJson())?["Value"]?["Desc"]}");
         }
         /// <summary>
         ///   Test create and update a to do from a user
@@ -61,6 +64,7 @@ namespace ToDoTest
             string oldToDoDesc = "Old todo!";
             string newToDoDesc = "New todo!";
             ToDo.Models.ToDo? toDo = await CreateToDoInMemory(oldToDoDesc);
+            Assert.IsFalse(toDo?.Complete);
             ToDo.Models.ToDo updatedToDo = new()
             {
                 Id = toDo!.Id,
@@ -69,11 +73,12 @@ namespace ToDoTest
                 UserId = toDo.UserId
             };
             IActionResult result = await toDoController!.UpdateToDo(updatedToDo, autorizationToken);
-            Assert.AreEqual<int?>(200, ((OkObjectResult)result).StatusCode);
-            Assert.AreEqual<int>(toDo.Id, ToInt32(JsonObject.Parse(result.ToJson())?["Value"]?["Id"]?.ToString()));
-            Assert.AreEqual<int>(toDo.UserId, ToInt32(JsonObject.Parse(result.ToJson())?["Value"]?["UserId"]?.ToString()));
-            Assert.AreNotEqual<string>(oldToDoDesc, JsonObject.Parse(result.ToJson())?["Value"]?["Desc"]?.ToString());
-            WriteLine($"To Do updated to: {JsonObject.Parse(result.ToJson())?["Value"]?["Desc"]?.ToString()}");
+            Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
+            Assert.AreEqual(toDo.Id, ToInt32(JsonNode.Parse(result.ToJson())?["Value"]?["Id"]?.ToString()));
+            Assert.AreEqual(toDo.UserId, ToInt32(JsonNode.Parse(result.ToJson())?["Value"]?["UserId"]?.ToString()));
+            Assert.IsTrue(ToBoolean(JsonNode.Parse(result.ToJson())?["Value"]?["Complete"]?.ToString()));
+            Assert.AreNotEqual(oldToDoDesc, JsonNode.Parse(result.ToJson())?["Value"]?["Desc"]?.ToString());
+            WriteLine($"To Do updated to: {JsonNode.Parse(result.ToJson())?["Value"]?["Desc"]?.ToString()}");
         }
         /// <summary>
         ///   Test create and dalete a to do from a user
@@ -82,21 +87,22 @@ namespace ToDoTest
         public async Task CreateAndDelete()
         {
             ToDo.Models.ToDo? toDo = await CreateToDoInMemory("ToDo to delete");
-            int toDoCount = ToInt32(JsonObject.Parse(toDoController!.Find(autorizationToken).ToJson())?["Value"]?["Count"]?.ToString());
+            int toDoCount = ToInt32(JsonNode.Parse((await toDoController!.Find(autorizationToken)).ToJson())?["Value"]?["Count"]?.ToString());
             IActionResult result = await toDoController.DeleteToDo(toDo!.Id, autorizationToken);
-            Assert.AreEqual<int?>(200, ((OkObjectResult)result).StatusCode);
-            Assert.AreEqual<int?>(toDoCount - 1, ToInt32(JsonObject.Parse(toDoController.Find(autorizationToken).ToJson())?["Value"]?["Count"]?.ToString()));
-            Assert.AreNotEqual<int?>(toDoCount, ToInt32(JsonObject.Parse(toDoController.Find(autorizationToken).ToJson())?["Value"]?["Count"]?.ToString()));
-            WriteLine($"Num of to do deleted: {((OkObjectResult)result).Value}");
+            int countToDos = ToInt32(JsonNode.Parse((await toDoController.Find(autorizationToken)).ToJson())?["Value"]?["Count"]?.ToString());
+            Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
+            Assert.AreEqual<int?>(toDoCount - 1, countToDos);
+            Assert.AreNotEqual<int?>(toDoCount,countToDos);
+            WriteLine(((OkObjectResult)result).Value);
         }
         /// <summary>
         ///   Test fail find a to do from a user by bad token
         /// </summary>
         [TestMethod]
-        public void FailFind()
+        public async Task FailFind()
         {
             string badToken = "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im5vdHJlYWx1c2VyIiwiSWQiOiI5OTk5IiwibmJmIjoxNzA0NTY0ODk2LCJleHAiOjE3MDQ1NjYzOTYsImlhdCI6MTcwNDU2NDg5Nn0.Wb_OQh1uZ6EbJllVxTR8XUO2AS7YiWJwwRKvMOS4HcY";
-            IActionResult result = toDoController!.Find(badToken);
+            IActionResult result = await toDoController!.Find(badToken);
             Assert.AreEqual<int?>(404, ((NotFoundResult)result).StatusCode);
             WriteLine(result.ToJson());
         }
@@ -110,7 +116,7 @@ namespace ToDoTest
         {
             User testUser = new() { Username = "testToDo", Email = "testToDo@test.com", Password = "1234@#Aa" };
             dbContext = InMemoryDbContext();
-            toDoController = new(dbContext);
+            toDoController = new(dbContext, new Redis(new MemoryDistributedCache(Options.Create<MemoryDistributedCacheOptions>(new MemoryDistributedCacheOptions()))));
             AuthController auth = new AuthController(dbContext, new JWTServices(Configuration()));
             await auth.Register(testUser);
             autorizationToken = $"Bearer: {JObject.Parse((await auth.Authentication(new ToDo.Models.Parameters.UserLogin { Identifier = testUser.Username, Password = testUser.Password }) as OkObjectResult).ToJson())["Value"]?["token"]?.ToString()}";
@@ -140,7 +146,7 @@ namespace ToDoTest
         /// </summary>
         /// <param name="toDoDesc">Optional desc of to do</param>
         /// <returns></returns>
-        private static async Task<ToDo.Models.ToDo?> CreateToDoInMemory(string toDoDesc = "default toDo desk") => JsonConvert.DeserializeObject<ToDo.Models.ToDo>(JsonObject.Parse(((OkObjectResult)(await toDoController!.CreateTodo(toDoDesc, autorizationToken))).ToJson())!["Value"]!["toDo"]!.ToString());
+        private static async Task<ToDo.Models.ToDo?> CreateToDoInMemory(string toDoDesc = "default toDo desk") => JsonConvert.DeserializeObject<ToDo.Models.ToDo>(JsonNode.Parse(((OkObjectResult)(await toDoController!.CreateTodo(toDoDesc, autorizationToken))).ToJson())!["Value"]!["toDo"]!.ToString());
     }
 }
 
