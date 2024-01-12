@@ -2,7 +2,8 @@ version: '3.4'
 
 services:
   todo:
-    image: ${DOCKER_REGISTRY-}todo
+    container_name: toDoApi
+    image: todoapi
     build:
       context: .
       dockerfile: ToDo/Dockerfile 
@@ -18,7 +19,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-        
+
   db:
     container_name: postgresTodo
     image: postgres:alpine
@@ -33,8 +34,18 @@ services:
       interval: 0s
       timeout: 10s
       retries: 3
+
   cache:
     container_name: redisToDo
     image: redis:alpine
     ports:
       - "6379:6379"
+
+  web:
+    container_name: toDoWeb
+    image: todoweb
+    build: 
+      dockerfile: ToDoWeb/Dockerfile
+    ports:
+       - "4201:4201"
+    command: sh -c "npm run dev"

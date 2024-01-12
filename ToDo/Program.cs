@@ -83,7 +83,24 @@ builder.Services.AddScoped<Redis>();
 
 builder.WebHost.UseUrls("https://*:8081");
 
+//Add cors to test API
+string corsKey = "TestLocalDevelopment";
+builder.Services.AddCors(opts =>
+{
+    opts.AddPolicy(name: corsKey, policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithOrigins("http://localhost:4200", "http://localhost:4201", "http://127.0.0.1:5500");
+    });
+});
+
+
 var app = builder.Build();
+
+//Add cors to test API
+app.UseCors(corsKey);
 
 //Database migrate at runtime
 using (IServiceScope scope = app.Services.CreateScope())

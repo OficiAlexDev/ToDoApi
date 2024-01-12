@@ -1,0 +1,79 @@
+<section class="mainSection relative">
+    <app-navbar ngClass="sticky top-0 z-10"></app-navbar>
+
+    <div class="px-8 py-4">
+        <div *ngIf="toDos.length > 0">
+            <h2>Completed To Do: {{completeToDos}}/{{toDos.length}} - {{completeToDos/toDos.length*100 | number
+                :"1.2-2"}}%</h2>
+        </div>
+    </div>
+    
+    <div class="flex flex-wrap justify-center px-8 my-4">
+        <div *ngFor="let toDo of toDos"
+            class="md:w-1/4 min-w-full text-center bg-primaryLight overflow-hidden bg-opacity-20 rounded-md p-2 relative m-1 flex justify-start items-start ">
+            <div class="absolute start-1 top-1.5 bgColor rounded-md flex justify-center items-center">
+                <svg (click)="expandedToDo = toDo" xmlns="http://www.w3.org/2000/svg"
+                    class="dark:text-primaryLight text-primaryDark m-1 showIcon cursor-pointer icon icon-tabler icon-tabler-paperclip"
+                    width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path
+                        d="M15 7l-6.5 6.5a1.5 1.5 0 0 0 3 3l6.5 -6.5a3 3 0 0 0 -6 -6l-6.5 6.5a4.5 4.5 0 0 0 9 9l6.5 -6.5" />
+                </svg>
+                <div (click)="editToDo(toDo)"
+                    class="{{toDo.complete ?'text-emerald-700 dark:text-emerald-400 bg-current':'text-red-700 dark:text-red-500'}} showIcon cursor-pointer m-1 w-6 h-6 border-2 border-current rounded-md flex items-center justify-center transition-all duration-150 ease-in">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="{{toDo.complete ? '':'scale-0'}} textBg icon icon-tabler icon-tabler-check" width="16"
+                        viewBox="0 0 24 24" stroke-width="4" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M5 12l5 5l10 -10" />
+                    </svg>
+                </div>
+                <svg (click)="deleteToDo(toDo.id)" xmlns="http://www.w3.org/2000/svg"
+                    class="m-1 showIcon cursor-pointer text-red-700 dark:text-red-500 icon icon-tabler icon-tabler-trash"
+                    width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M4 7l16 0" />
+                    <path d="M10 11l0 6" />
+                    <path d="M14 11l0 6" />
+                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                </svg>
+
+            </div>
+            <div class="cursor-pointer w-full" (click)="editToDo(toDo)">
+                <h3 class="intent textColor line-clamp-2">{{toDo.desc}}</h3>
+            </div>
+        </div>
+    </div>
+    <!-- To Do Detail -->
+    <app-modal *ngIf="expandedToDo != undefined" (close)="expandedToDo = undefined">
+        <div class="flex-1 flex flex-col">
+            <h2 class="p-2">{{expandedToDo.desc}}</h2>
+        </div>
+    </app-modal>
+    <!-- Add To Do Modal -->
+    <app-modal *ngIf="showAddModal" (close)="showAddModal = false">
+        <div class="flex-1 flex flex-col">
+            <h2 class="p-2">Add new to do!</h2>
+            <form action="" class="flex-1 flex flex-col justify-center items-center">
+                <input type="text" [(ngModel)]="newToDo" name="newToDo" id="newToDo">
+                <button class="mt-2" (click)="createNewToDo()">Create</button>
+            </form>
+        </div>
+    </app-modal>
+    <!-- Add To Do Button -->
+    <div class="fixed md:bottom-4 md:end-4 bottom-8 end-6 md:scale-100 scale-150">
+        <button (click)="showAddModal = true" class="aspect-square rounded-xl bg-opacity-35 backdrop-blur-md p-2 ">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24"
+                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 5l0 14" />
+                <path d="M5 12l14 0" />
+            </svg>
+        </button>
+    </div>
+</section>

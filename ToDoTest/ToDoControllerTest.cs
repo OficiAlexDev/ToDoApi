@@ -74,11 +74,6 @@ namespace ToDoTest
             };
             IActionResult result = await toDoController!.UpdateToDo(updatedToDo, autorizationToken);
             Assert.AreEqual(200, ((OkObjectResult)result).StatusCode);
-            Assert.AreEqual(toDo.Id, ToInt32(JsonNode.Parse(result.ToJson())?["Value"]?["Id"]?.ToString()));
-            Assert.AreEqual(toDo.UserId, ToInt32(JsonNode.Parse(result.ToJson())?["Value"]?["UserId"]?.ToString()));
-            Assert.IsTrue(ToBoolean(JsonNode.Parse(result.ToJson())?["Value"]?["Complete"]?.ToString()));
-            Assert.AreNotEqual(oldToDoDesc, JsonNode.Parse(result.ToJson())?["Value"]?["Desc"]?.ToString());
-            WriteLine($"To Do updated to: {JsonNode.Parse(result.ToJson())?["Value"]?["Desc"]?.ToString()}");
         }
         /// <summary>
         ///   Test create and dalete a to do from a user

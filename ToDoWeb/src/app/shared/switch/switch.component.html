@@ -1,0 +1,10 @@
+<div class="relative w-[32px] h-[18px] rounded-full border-current border-2 cursor-pointer scale-150"
+    (click)="switch.emit(value =! value)">
+    <div
+        class=" w-[12px] absolute {{value ? '-translate-x-full -ms-[1px]':'ms-[1px]'}} start-1/2 top-1/2 -translate-y-1/2 aspect-square bg-current rounded-full transition-all duration-100 ease-in-out flex">
+        <div class="flex-1 flex textBg justify-center items-center">
+            <ng-content *ngIf="value" select="[iconOn]"></ng-content>
+            <ng-content *ngIf="!value" select="[iconOff]"></ng-content>
+        </div>
+    </div>
+</div>

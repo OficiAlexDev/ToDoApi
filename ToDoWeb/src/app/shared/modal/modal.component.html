@@ -1,0 +1,17 @@
+<div *ngIf="showModal" class="fixed top-0 z-50 flex justify-center items-center w-full h-screen">
+    <div class="w-full h-screen absolute bg-opacity-50 backdrop-blur-sm" (click)="changeModalState()"></div>
+    <div
+        class="mx-16 min-w-64 relative overflow-x-hidden overflow-y-auto flex flex-col p-8 z-50 bg-primaryLight bg-opacity-15 dark:bg-opacity-15 backdrop-blur-md rounded-lg {{modalAnim ? 'scale-100':'scale-0'}} transition-all duration-300 ease-out">
+        <div class="absolute end-2 top-2 dark:text-red-500 text-red-800 ">
+            <svg  (click)="changeModalState()" xmlns="http://www.w3.org/2000/svg" class="showIcon cursor-pointer icon icon-tabler icon-tabler-x" width="24" height="24"
+                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M18 6l-12 12" />
+                <path d="M6 6l12 12" />
+            </svg>
+        </div>
+        <ng-content></ng-content>
+    </div>
+</div>
+

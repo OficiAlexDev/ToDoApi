@@ -1,0 +1,109 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: Abel;
+    src: url(assets/fonts/Abel-Regular.ttf);
+}
+
+* {
+    font-family: Abel;
+    user-select: none;
+    -webkit-tap-highlight-color: #00000000;
+}
+
+.textColor {
+    @apply text-slate-950 dark:text-gray-200;
+}
+
+.textBg {
+    @apply dark:text-slate-950 text-gray-200;
+}
+
+.bgColor {
+    @apply bg-gray-200 dark:bg-slate-950;
+}
+
+body {
+    @apply bg-gray-200 overflow-x-hidden;
+}
+
+body.dark {
+    @apply bg-slate-950 text-gray-200;
+
+}
+
+.mainSection {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.intent {
+    text-indent: 96px;
+}
+
+button {
+    outline: none;
+}
+
+svg {
+    @apply transition-transform duration-150 ease-in;
+}
+
+.showIcon {
+    @apply hover:scale-110 active:scale-95;
+}
+
+.hideIcon {
+    @apply scale-0;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    @apply rounded-full md:min-w-72 min-w-52 outline-none text-center py-1 px-2 border-2 border-current bg-transparent text-current caret-current;
+}
+
+a,
+button {
+    @apply bg-primary hover:scale-110 active:scale-95 hover:bg-primaryLight active:bg-opacity-10 active:text-primaryLight text-white font-bold mx-auto rounded-full py-1 px-3 transition-all duration-100 ease-in disabled:opacity-70 disabled:bg-opacity-100 disabled:scale-100 disabled:text-white;
+}
+
+h1 {
+    @apply text-3xl;
+}
+
+h2 {
+    @apply text-2xl;
+}
+
+h3 {
+    @apply text-xl;
+}
+
+body::-webkit-scrollbar {
+    -webkit-appearance: none;
+    display: none;
+    width: 0;
+}
+
+::-webkit-scrollbar {
+    width: .35em;
+    @apply bg-primary bg-opacity-30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-primaryLight rounded-full;
+}
+
+::selection {
+    @apply text-primary bg-primaryLight bg-opacity-50;
+}
+
+body.dark>::selection {
+    @apply text-blue-300 bg-primaryLight bg-opacity-80;
+}

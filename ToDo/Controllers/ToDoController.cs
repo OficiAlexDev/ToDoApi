@@ -126,14 +126,21 @@ namespace ToDo.Controllers
         {
             User? user = db.User.Where(user => user.Id == IdInBaerer(authorization)).Include(user => user.ToDos).FirstOrDefault();
             Models.ToDo? oldToDo = user?.ToDos?.Where(oldToDo => Equals(oldToDo.Id, toDo.Id)).FirstOrDefault();
-            if (oldToDo != null)
+            try
             {
-                oldToDo.Desc = toDo.Desc ?? oldToDo.Desc;
-                oldToDo.Complete = toDo.Complete ?? oldToDo.Complete;
-                db.ToDo.Update(oldToDo);
-                await db.SaveChangesAsync();
-                await UpsertUserCache(authorization);
-                return Ok(oldToDo);
+                if (oldToDo != null)
+                {
+                    oldToDo.Desc = toDo.Desc ?? oldToDo.Desc;
+                    oldToDo.Complete = toDo.Complete ?? oldToDo.Complete;
+                    db.ToDo.Update(oldToDo);
+                    await db.SaveChangesAsync();
+                    await UpsertUserCache(authorization);
+                    return Ok("To do updated!");
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong ToDo not updated!");
             }
             return BadRequest("Something went wrong ToDo not updated!");
         }

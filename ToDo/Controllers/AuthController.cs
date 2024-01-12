@@ -29,21 +29,25 @@ namespace ToDo.Controllers
 
             User? user = db.User.Where(user => Equals(user.Username, newUser.Username)).FirstOrDefault();
             User? user1 = db.User.Where(user => Equals(user.Email, newUser.Email)).FirstOrDefault();
-            if (user != null || user1 != null)
+            if (user != null)
             {
-                return BadRequest("This user already exists!");
+                return BadRequest(new { status = "This username already in use!", code = 1 });
+            }
+            if (user1 != null)
+            {
+                return BadRequest(new { status = "This email already in use!", code = 2 });
             }
             if (!Regex.IsMatch(newUser.Password, passwordPattern))
             {
-                return BadRequest("The password is not strong enough!");
+                return BadRequest(new { status = "The password is not strong enough!", code = 3 });
             }
-            if (Regex.IsMatch(newUser.Username, excludeUsernamePattern))
+            if (Regex.IsMatch(newUser.Username, excludeUsernamePattern) || newUser.Username.Length < 4)
             {
-                return BadRequest("The username must contain only letters and numbers!");
+                return BadRequest(new { status = "The username must contain only letters and numbers and more than 4 characters!", code = 4 });
             }
             if (!Regex.IsMatch(newUser.Email, emailPattern))
             {
-                return BadRequest("The email is not valid!");
+                return BadRequest(new { status = "The email is not valid!", code = 5 });
             }
             db.User.Add(new()
             {
@@ -52,7 +56,7 @@ namespace ToDo.Controllers
                 Password = Password.Hash(newUser.Password),
             });
             await db.SaveChangesAsync();
-            return Ok("User creted");
+            return Ok(new { status = "User creted!", code = 0 });
         }
         /// <summary>
         /// Login existent user
